@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>English Proverb Quiz</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        #quiz-container {
+            width: 80%;
+            max-width: 600px;
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            position: relative;
+        }
+        #question-number {
+            margin-bottom: 20px;
+            font-size: 18px;
+        }
+        #question {
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
+        .option {
+            display: block;
+            background-color: #e0e0e0;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .option:hover {
+            background-color: #d0d0d0;
+        }
+        #result {
+            font-size: 24px;
+            margin-top: 20px;
+        }
+        .result-icon {
+            font-size: 50px;
+            margin-top: 10px;
+        }
+        .green {
+            color: green;
+        }
+        .red {
+            color: red;
+        }
+        #final-message {
+            font-size: 24px;
+            color: #ff69b4;
+            animation: heartbeat 2s infinite;
+            opacity: 0.5;
+        }
+        @keyframes heartbeat {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.5);
+            }
+        }
+        #restart-button {
+            display: inline-block;
+            width: 4cm;
+            height: 4cm;
+            background-color: red;
+            color: white;
+            font-size: 18px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 4cm;
+            text-decoration: none;
+            margin-top: 20px;
+            cursor: pointer;
+            display: none;
+        }
+        #chance-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: yellow;
+            color: black;
+            font-size: 30px;
+            padding: 10px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+            width: 50px;
+            height: 50px;
+            text-align: center;
+            line-height: 30px;
+            transition: transform 0.3s;
+        }
+        #chance-button:hover {
+            transform: scale(1.2);
+        }
+        #chance-label {
+            position: absolute;
+            top: 65px;
+            right: 25px;
+            font-size: 14px;
+            color: black;
+        }
+        #countdown {
+            font-size: 24px;
+            color: red;
+            margin-top: 20px;
+        }
+        #temporary-message {
+            font-size: 30px;
+            color: red;
+            font-weight: bold;
+            display: none;
+            margin-top: 20px;
+        }
+        .red-x {
+            font-size: 50px;
+            color: red;
+        }
+        .red-o {
+            font-size: 50px;
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <div id="quiz-container">
+        <div id="question-number">10 questions remaining</div>
+        <div id="question">What does "Even a tiger comes when spoken of" mean?</div>
+        <div class="option" onclick="checkAnswer(0)">1. You should be careful with your words.</div>
+        <div class="option" onclick="checkAnswer(1)">2. Rumors about close people are heard.</div>
+        <div class="option" onclick="checkAnswer(2)">3. There are widespread rumors.</div>
+        <div class="option" onclick="checkAnswer(3)">4. When you talk about someone, they appear.</div>
+        <div class="option" onclick="checkAnswer(4)">5. You should be brave like a tiger.</div>
+        <div id="result"></div>
+        <div id="temporary-message"></div>
+        <div id="message-icon"></div>
+        <a id="restart-button" onclick="restartQuiz()">again?</a>
+        <button id="chance-button" onclick="useChance()">★</button>
+        <div id="chance-label">찬스</div>
+        <div id="countdown"></div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                question: 'What does "Even a tiger comes when spoken of" mean?',
+                options: [
+                    'You should be careful with your words.',
+                    'Rumors about close people are heard.',
+                    'There are widespread rumors.',
+                    'When you talk about someone, they appear.',
+                    'You should be brave like a tiger.'
+                ],
+                answer: 3,
+                translations: {
+                    question: '"호랑이도 제 말하면 온다"는 무슨 뜻입니까?',
+                    options: [
+                        '말조심을 해야 한다.',
+                        '가까운 사람의 소문이 들려온다.',
+                        '소문이 자자하다.',
+                        '누군가에 대한 이야기를 하면 그 사람이 나타난다.',
+                        '호랑이처럼 용감해야 한다.'
+                    ]
+                }
+            },
+            {
+                question: 'What does "A bird in the hand is worth two in the bush" mean?',
+                options: [
+                    'You should take risks for a bigger reward.',
+                    'It is better to be content with what you have.',
+                    'Birds are very valuable animals.',
+                    'You should always aim for more.',
+                    'It is better to be safe than sorry.'
+                ],
+                answer: 1,
+                translations: {
+                    question: '"손 안의 새 한 마리가 덤불 속의 두 마리보다 낫다"는 무슨 뜻입니까?',
+                    options: [
+                        '더 큰 보상을 위해 위험을 감수해야 한다.',
+                        '자신이 가진 것에 만족하는 것이 좋다.',
+                        '새는 매우 귀중한 동물이다.',
+                        '항상 더 많은 것을 목표로 해야 한다.',
+                        '후회하는 것보다 안전한 것이 좋다.'
+                    ]
+                }
+            },
+            {
+                question: 'What does "Actions speak louder than words" mean?',
+                options: [
+                    'Words are more powerful than actions.',
+                    'Actions are more important than promises.',
+                    'Talking is better than doing.',
+                    'Words can change the world.',
+                    'People should be judged by their words.'
+                ],
+                answer: 1,
+                translations: {
+                    question: '"행동은 말보다 더 큰 소리를 낸다"는 무슨 뜻입니까?',
+                    options: [
+                        '말이 행동보다 더 강력하다.',
+                        '행동은 약속보다 중요하다.',
+                        '말하는 것이 행동하는 것보다 낫다.',
+                        '말은 세상을 바꿀 수 있다.',
+                        '사람들은 그들의 말로 평가되어야 한다.'
+                    ]
+                }
+            },
+            {
+                question: 'What does "The early bird catches the worm" mean?',
+                options: [
+                    'Morning is the best time to eat.',
+                    'Early risers get the best opportunities.',
+                    'Worms are only available in the morning.',
+                    'Birds are most active in the morning.',
+                    'It is important to be punctual.'
+                ],
+                answer: 1,
+                translations: {
+                    question: '"일찍 일어나는 새가 벌레를 잡는다"는 무슨 뜻입니까?',
+                    options: [
+                        '아침은 먹기에 가장 좋은 시간이다.',
+                        '일찍 일어나는 사람들이 최고의 기회를 얻는다.',
+                        '벌레는 아침에만 먹을 수 있다.',
+                        '새들은 아침에 가장 활동적이다.',
+                        '정확한 시간이 중요하다.'
+                    ]
+                }
+            },
+            {
+                question: 'What does "Don’t count your chickens before they hatch" mean?',
+                options: [
+                    'Don’t make plans based on assumptions.',
+                    'Chickens are very valuable animals.',
+                    'Always count your chickens carefully.',
+                    'It’s important to plan for the future.',
+                    'Don’t take unnecessary risks.'
+                ],
+                answer: 0,
+                translations: {
+                    question: '"달걀이 부화하기 전에 닭을 세지 말라"는 무슨 뜻입니까?',
+                    options: [
+                        '가정에 기반한 계획을 세지 말라.',
+                        '닭은 매우 귀중한 동물이다.',
+                        '항상 닭을 주의 깊게 세어야 한다.',
+                        '미래를 계획하는 것이 중요하다.',
+                        '불필요한 위험을 감수하지 말라.'
+                    ]
+                }
+            },
+            {
+                question: 'What does "Don’t put all your eggs in one basket" mean?',
+                options: [
+                    'Investing everything in one place is risky.',
+                    'Eggs need to be handled with care.',
+                    'Baskets are not suitable for holding eggs.',
+                    'It’s important to use multiple baskets for eggs.',
+                    'One basket is enough for all your eggs.'
+                ],
+                answer: 0,
+                translations: {
+                    question: '"모든 달걀을 하나의 바구니에 담지 말라"는 무슨 뜻입니까?',
+                    options: [
+                        '모든 것을 한 곳에 투자하는 것은 위험하다.',
+                        '달걀은 깨지기 쉬워서 조심히 다뤄야 한다.',
+                        '바구니는 달걀을 담기에 적합하지 않다.',
+                        '달걀을 위해 여러 바구니를 사용하는 것이 중요하다.',
+                        '하나의 바구니만 있으면 충분하다.'
+                    ]
+                }
+            },
+            {
+                question: 'What does "Every cloud has a silver lining" mean?',
+                options: [
+                    'Good can come out of bad situations.',
+                    'Clouds are made of silver.',
+                    'There is always a positive side to every situation.',
+                    'Silver linings are found only in clouds.',
+                    'Clouds are always dark and gloomy.'
+                ],
+                answer: 2,
+                translations: {
+                    question: '"모든 구름에는 은빛 테두리가 있다"는 무슨 뜻입니까?',
+                    options: [
+                        '나쁜 상황에서도 좋은 일이 생길 수 있다.',
+                        '구름은 은으로 만들어져 있다.',
+                        '모든 상황에는 항상 긍정적인 면이 있다.',
+                        '은빛 테두리는 구름에서만 발견된다.',
+                        '구름은 항상 어둡고 음울하다.'
+                    ]
+                }
+            },
+            {
+                question: 'What does "The grass is always greener on the other side" mean?',
+                options: [
+                    'Other people’s situations often seem better than your own.',
+                    'Grass is always green in other places.',
+                    'It’s better to look at other people’s lives.',
+                    'The other side of the grass is more fertile.',
+                    'Green grass indicates better health.'
+                ],
+                answer: 0,
+                translations: {
+                    question: '"다른 쪽의 풀은 항상 더 푸르다"는 무슨 뜻입니까?',
+                    options: [
+                        '다른 사람의 상황이 종종 자신의 것보다 나 보인다.',
+                        '풀은 다른 곳에서 항상 푸르다.',
+                        '다른 사람의 삶을 보는 것이 더 좋다.',
+                        '풀의 다른 쪽은 더 비옥하다.',
+                        '푸른 풀은 더 나은 건강을 나타낸다.'
+                    ]
+                }
+            },
+            {
+                question: 'What does "Too many cooks spoil the broth" mean?',
+                options: [
+                    'Too many people involved in a task can ruin it.',
+                    'Cooks are always busy with broth.',
+                    'Broth tastes better with more cooks.',
+                    'Too many cooks are unnecessary.',
+                    'The more cooks, the better the food.'
+                ],
+                answer: 0,
+                translations: {
+                    question: '"너무 많은 요리사는 국물을 망친다"는 무슨 뜻입니까?',
+                    options: [
+                        '작업에 너무 많은 사람들이 참여하면 그것을 망칠 수 있다.',
+                        '요리사는 항상 국물로 바쁘다.',
+                        '국물은 더 많은 요리사와 함께 더 맛있다.',
+                        '너무 많은 요리사는 불필요하다.',
+                        '요리사가 많을수록 음식이 더 좋다.'
+                    ]
+                }
+            },
+            {
+                question: 'What does "The squeaky wheel gets the grease" mean?',
+                options: [
+                    'Those who make the most noise get attention.',
+                    'Wheels need regular greasing.',
+                    'Grease is used to fix squeaky wheels.',
+                    'Squeaky wheels are better for transportation.',
+                    'Quiet wheels are more reliable.'
+                ],
+                answer: 0,
+                translations: {
+                    question: '"삐걱거리는 바퀴가 기름을 얻는다"는 무슨 뜻입니까?',
+                    options: [
+                        '가장 많은 소음을 내는 사람이 주목받는다.',
+                        '바퀴는 정기적으로 기름칠이 필요하다.',
+                        '기름은 삐걱거리는 바퀴를 수리하는 데 사용된다.',
+                        '삐걱거리는 바퀴가 운송에 더 좋다.',
+                        '조용한 바퀴가 더 신뢰할 수 있다.'
+                    ]
+                }
+            },
+            {
+                question: 'What does "When in Rome, do as the Romans do" mean?',
+                options: [
+                    'Adopt the customs of the place you are in.',
+                    'Romans have unique customs.',
+                    'It’s important to follow local traditions.',
+                    'Traveling to Rome is necessary to understand Romans.',
+                    'One should always follow their own traditions.'
+                ],
+                answer: 0,
+                translations: {
+                    question: '"로마에 있을 때는 로마 사람처럼 행동하라"는 무슨 뜻입니까?',
+                    options: [
+                        '자신이 있는 곳의 관습을 채택하라.',
+                        '로마 사람들은 독특한 관습을 가진다.',
+                        '현지 전통을 따르는 것이 중요하다.',
+                        '로마를 여행해야만 로마인을 이해할 수 있다.',
+                        '항상 자신의 전통을 따르는 것이 좋다.'
+                    ]
+                }
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let remainingQuestions = questions.length;
+        let chanceUsed = Array(questions.length).fill(false);
+
+        function showQuestion(index) {
+            const question = questions[index];
+            document.getElementById('question').innerText = question.question;
+            const options = document.getElementsByClassName('option');
+            for (let i = 0; i < options.length; i++) {
+                options[i].innerText = question.options[i];
+            }
+            document.getElementById('question-number').innerText = `${remainingQuestions} questions remaining`;
+            document.getElementById('result').innerText = '';
+            document.getElementById('temporary-message').style.display = 'none';
+            document.getElementById('message-icon').innerHTML = '';
+            document.getElementById('restart-button').style.display = 'none';
+            document.getElementById('chance-button').style.display = 'inline-block';
+            document.getElementById('chance-label').style.display = 'inline-block';
+        }
+
+        function checkAnswer(selectedIndex) {
+            const correctIndex = questions[currentQuestionIndex].answer;
+            if (selectedIndex === correctIndex) {
+                document.getElementById('result').innerHTML = '<span class="result-icon red-o">&#x2714;</span> NICE!';
+                score++;
+            } else {
+                document.getElementById('result').innerHTML = '<span class="result-icon red-x">&#x2716;</span> ' + (Math.random() < 0.5 ? '에구머니나!' : '이런!');
+            }
+            remainingQuestions--;
+            currentQuestionIndex++;
+            if (remainingQuestions === 0) {
+                showFinalMessage();
+            } else {
+                showQuestion(currentQuestionIndex);
+            }
+        }
+
+        function showFinalMessage() {
+            document.getElementById('question').innerText = 'Quiz finished!';
+            document.getElementById('result').innerText = `Your score: ${score}`;
+            document.getElementById('restart-button').style.display = 'inline-block';
+            document.getElementById('chance-button').style.display = 'none';
+            document.getElementById('chance-label').style.display = 'none';
+        }
+
+        function restartQuiz() {
+            currentQuestionIndex = 0;
+            score = 0;
+            remainingQuestions = questions.length;
+            chanceUsed = Array(questions.length).fill(false);
+            document.getElementById('restart-button').style.display = 'none';
+            document.getElementById('chance-button').style.display = 'inline-block';
+            document.getElementById('chance-label').style.display = 'inline-block';
+            showQuestion(currentQuestionIndex);
+        }
+
+        function useChance() {
+            if (chanceUsed[currentQuestionIndex]) {
+                document.getElementById('temporary-message').innerText = 'You have already used your chance for this question!';
+                document.getElementById('temporary-message').style.display = 'block';
+                return;
+            }
+            chanceUsed[currentQuestionIndex] = true;
+            const question = questions[currentQuestionIndex];
+            const translation = question.translations;
+            document.getElementById('question').innerText = translation.question;
+            const options = document.getElementsByClassName('option');
+            for (let i = 0; i < options.length; i++) {
+                options[i].innerText = translation.options[i];
+            }
+            document.getElementById('chance-button').style.display = 'none';
+            document.getElementById('chance-label').style.display = 'none';
+        }
+
+        function startQuiz() {
+            showQuestion(currentQuestionIndex);
+        }
+
+        startQuiz();
+    </script>
+</body>
+</html>
